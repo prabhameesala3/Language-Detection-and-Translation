@@ -41,5 +41,8 @@ def detect_language():
                            original_text=text,
                            detected_lang=detected_name,
                            languages=LANGUAGES)
+# if __name__ == "__main__":
+#     app.run(debug=True, port=5500)
 if __name__ == "__main__":
-    app.run(debug=True, port=5500)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
