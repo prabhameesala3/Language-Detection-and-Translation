@@ -1,8 +1,13 @@
+# from flask import Flask, render_template, request
 from flask import Flask, render_template, request
+from deep_translator import GoogleTranslator # <--- ADD THIS IMPORT
+from langdetect import detect                 # <--- You need this too
+import os
 from googletrans import Translator, LANGUAGES
 
 app = Flask(__name__)
-translator = Translator()
+# translator = Translator()
+translator = GoogleTranslator()
 
 @app.route('/')
 def index():
@@ -94,4 +99,5 @@ if __name__ == "__main__":
 #     # Use Render provided port or fallback to 5500 locally
 #     port = int(os.environ.get("PORT", 5500))
 #     app.run(host="0.0.0.0", port=port)
+
 
