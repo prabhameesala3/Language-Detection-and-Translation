@@ -1,9 +1,4 @@
-﻿# Flask==2.3.2
-# deep-translator==1.11.4
-# langdetect==1.0.9
-# gunicorn==23.0.0
-# googletrans==4.0.0-rc1
-
 Flask==2.3.2
 deep-translator==1.11.4
 langdetect==1.0.9
+
