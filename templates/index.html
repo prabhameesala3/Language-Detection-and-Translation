@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Language Detection & Translation</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+        height: 100%;
+        font-family: 'Roboto', sans-serif;
+        background: #617c89; /* pastel background */
+        color: #333;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 900px;
+        height: 95vh;
+        overflow: hidden;
+        padding: 15px;
+        background: #f0fff0; /* pastel green */
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: background 0.3s, transform 0.3s;
+    }
+
+    .container:hover {
+        background: #d9fbe7;
+        transform: translateY(-3px);
+    }
+
+    h1 {
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 15px;
+        color: #2c3e50;
+    }
+
+    .cards-wrapper {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .card {
+        background: #fef9f0; /* pastel yellow  */
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        transition: background 0.3s, transform 0.3s;
+    }
+
+    .card:hover {
+        background: #f0ffe0; /* pastel green */
+        transform: translateY(-3px);
+    }
+
+    .card h2 {
+        margin-bottom: 12px;
+        color: #34495e;
+        font-size: 1.2rem;
+    }
+
+    textarea {
+        width: 100%;
+        height: 100px;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        resize: none;
+        margin-bottom: 12px;
+        transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+    }
+
+    textarea:focus {
+        border-color: #4caf50;
+        box-shadow: 0 0 12px rgba(76, 175, 80, 0.4);
+        transform: scale(1.02);
+        outline: none;
+    }
+
+    select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        margin-bottom: 12px;
+        transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+    }
+
+    select:focus {
+        border-color: #4caf50;
+        box-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
+        transform: scale(1.02);
+        outline: none;
+    }
+
+    button {
+        background-color: #4caf50;
+        color: #fff;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+        width: 100%;
+    }
+
+    button:hover {
+        background-color: #45a049;
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+    }
+
+    .result {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 1rem;
+        opacity: 0;
+        transform: translateY(15px);
+        transition: opacity 0.5s ease, transform 0.5s ease, background-color 0.5s;
+        word-wrap: break-word;
+    }
+
+    .result.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .result.detected {
+        background-color: #d0f0c0;
+        border: 1px solid #2ecc71;
+        color: #2c3e50;
+    }
+
+    .result.error {
+        background-color: #ffcccc;
+        border: 1px solid #e74c3c;
+        color: #2c3e50;
+    }
+
+    footer {
+        text-align: center;
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        margin-top: 5px;
+    }
+
+    @media (max-width: 768px) {
+        .container { height: 95vh; padding: 10px; }
+        h1 { font-size: 1.8rem; }
+        .card h2 { font-size: 1.1rem; }
+        textarea { height: 90px; font-size: 0.95rem; }
+        select { font-size: 0.95rem; }
+        button { font-size: 0.95rem; padding: 10px; }
+    }
+
+    @media (max-width: 480px) {
+        h1 { font-size: 1.6rem; }
+        .card h2 { font-size: 1rem; }
+        textarea { height: 80px; font-size: 0.9rem; }
+        select { font-size: 0.9rem; }
+        button { font-size: 0.9rem; padding: 8px; }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>🌐 Language Detection & Translation</h1>
+
+    <div class="cards-wrapper">
+        <div class="card">
+            <h2>Detect Language</h2>
+            <form method="POST" action="/detect">
+                <textarea name="text" placeholder="Type or paste text here..." required>{{ original_text or '' }}</textarea>
+                <button type="submit" class="btn-detect">Detect Language</button>
+            </form>
+            {% if detected_lang %}
+            <div class="result show detected">
+                <strong>Detected Language:</strong> {{ detected_lang }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2>Translate Text</h2>
+            <form method="POST" action="/trans">
+                <textarea name="text" placeholder="Type or paste text here..." required>{{ original_text or '' }}</textarea>
+                <select name="target_lang">
+                    {% for code, name in languages.items() %}
+                    <option value="{{ code }}" {% if selected_lang == code %}selected{% endif %}>{{ name.title() }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-translate">Translate</button>
+            </form>
+
+            {% if translation %}
+            <div class="result show detected">
+                <strong>Translation:</strong> {{ translation }}
+            </div>
+            <div class="result show detected">
+                <strong>Detected Original Language:</strong> {{ detected_lang }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer>
+        <p>Developed by <strong>Prabha M</strong></p>
+    </footer>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const results = document.querySelectorAll('.result');
+        results.forEach(res => {
+            if(res.textContent.trim() !== '') {
+                res.classList.add('show');
+                if(res.textContent.toLowerCase().includes('error')) {
+                    res.classList.add('error');
+                } else {
+                    res.classList.add('detected');
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>
