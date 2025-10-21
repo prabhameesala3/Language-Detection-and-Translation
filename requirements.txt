@@ -4,3 +4,4 @@ langdetect==1.0.9
 # Use a pinned, stable version of googletrans
 googletrans==4.0.0-rc1
 
+
